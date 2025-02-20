@@ -1,2 +1,14 @@
 /venv
 summary.txt
+
+# Ignore compiled Python files
+__pycache__/
+*.pyc
+*.pyo
+
+# Ignore database migrations history (optional)
+migrations/versions/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
