@@ -14,10 +14,14 @@ class User(Base):
     skills = Column(Text, nullable=True) # List of user skills
     resume = Column(Text, nullable=True) # Link to the uploaded resume
     create_at = Column(DateTime, default=datetime.utcnow) # Account creation timestamp
-    
+
+    # Relationship with job applications
+    applications = relationship("Application", back_populates="user")
+
 
 # Jobs table: Stores job postings
 class Job(Base):
+    __tablename__ = "jobs"
 
     id = Column(Integer, primary_key=True, index=True)  
     title = Column(String, nullable=False)  
@@ -27,3 +31,20 @@ class Job(Base):
     requirements = Column(Text, nullable=True) # Job requirements
     posted_at = Column(DateTime, default=datetime.utcnow) # Job posting date  
     source = Column(String, nullable=True) # Job source (e.g., JSearch API) 
+
+    # Relationship with job applications
+    applications = relationship("Application", back_populates="job")
+
+
+class Application(Base):
+    __tablename__ = "applications"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id")) # Reference to user
+    job_id = Column(Integer, ForeignKey("jobs.id")) # Reference to job
+    status = Column(String, default="Pending")  # Application status (Pending, Accepted, Rejected)
+    applied_at = Column(DateTime, default=datetime.utcnow) # Timestamp of application submission
+
+    # Relationships
+    user = relationship("User", back_populates="applications")
+    job = relationship("Job", back_populates="applications")
