@@ -1,6 +1,7 @@
 import requests
 from dotenv import load_dotenv
 import os
+from database.models import session, JobListing
 
 load_dotenv()
 
@@ -13,5 +14,20 @@ def fetch_jobs(query, location):
     }
     params = {"query": f"{query} in {location}", "page": "1", "num_pages": "1"}
     response = requests.get(url, headers=headers, params=params)
+    jobs = response.json().get("data", [])
+    
+    # Save jobs to the database
+    save_jobs_to_db(jobs)
+    
+    return jobs
 
-    return response.json().get("data", [])
+def save_jobs_to_db(jobs):
+    for job in jobs:
+        job_listing = JobListing(
+            title=job.get("job_title"),
+            description=job.get("job_description"),
+            company=job.get("employer_name"),
+            location=job.get("job_country")
+        )
+        session.add(job_listing)
+    session.commit()
