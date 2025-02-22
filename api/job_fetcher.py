@@ -2,6 +2,7 @@ import requests
 from dotenv import load_dotenv
 import os
 from database.models import session, JobListing
+from sqlalchemy import text
 
 load_dotenv()
 
@@ -22,6 +23,11 @@ def fetch_jobs(query, location):
     return jobs
 
 def save_jobs_to_db(jobs):
+    # Truncate the table
+    session.execute(text("TRUNCATE TABLE job_listings RESTART IDENTITY"))
+    session.commit()
+
+    # Insert new job listings
     for job in jobs:
         job_listing = JobListing(
             title=job.get("job_title"),
